@@ -16,6 +16,7 @@ class AppSerializer(serializers.ModelSerializer):
         model = App
         fields = '__all__'
 
+# For attaching app data to Jobs endpoint
 class JobWithAppSerializer(serializers.ModelSerializer):
     app = AppSerializer()
 

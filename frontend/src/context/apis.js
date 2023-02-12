@@ -11,18 +11,18 @@ function Provider({ children }) {
   const [activeAppReviewsData, setActiveAppReviewsData] = useState([]);
 
   const fetchJobs = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/jobs/');
+    const response = await axios.get('http://127.0.0.1:8000/api/jobs');
     setJobs(response.data.jobs);
   };
 
   const fetchApps = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/apps/');
+    const response = await axios.get('http://127.0.0.1:8000/api/apps');
     console.log(response.data.apps);
     setApps(response.data.apps);
   };
 
   const fetchReviews = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/reviews/');
+    const response = await axios.get('http://127.0.0.1:8000/api/reviews');
     setReviewsCount(response.data.count);
   };
 
@@ -38,7 +38,7 @@ function Provider({ children }) {
       image_url: app.image,
     };
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/apps/`, postBody);
+      const response = await axios.post(`http://127.0.0.1:8000/api/apps`, postBody);
       return response;
     } catch (err) {
       return err.response;
@@ -52,7 +52,7 @@ function Provider({ children }) {
       last_run_timestamp: null,
       user: 1,
     };
-    const response = await axios.post(`http://127.0.0.1:8000/api/jobs/`, postBody);
+    const response = await axios.post(`http://127.0.0.1:8000/api/jobs`, postBody);
     return response;
   };
 
@@ -67,7 +67,7 @@ function Provider({ children }) {
       app: job.app.id,
       frequency: newFrequency,
     };
-    const response = await axios.put(`http://127.0.0.1:8000/api/jobs/${job.id}/`, putBody);
+    const response = await axios.put(`http://127.0.0.1:8000/api/jobs/${job.id}`, putBody);
     return response;
   };
 
@@ -77,7 +77,7 @@ function Provider({ children }) {
   };
 
   const fetchAppReviewsData = async (appId) => {
-    const response = await axios.get(`http://127.0.0.1:8000/api/apps/${appId}/reviews/data/`);
+    const response = await axios.get(`http://127.0.0.1:8000/api/apps/${appId}/reviews/data`);
     console.log('Running fetchAppReviewsData');
     setActiveAppReviewsData(response);
   };

@@ -5,7 +5,17 @@ from bs4 import BeautifulSoup
 import re
 
 
-def verify_shopify_app(app_identifier):
+def verify_shopify_app(app_identifier: str):
+    """
+    Verifies that a given app_identifier exists on the Shopify App Store
+
+    Parameters:
+        app_identifier (str): The identifier of the Shopify app to scrape. Can be found in the Shopify App Store URL: https://apps.shopify.com/{app_identifier}/reviews
+
+    Returns:
+        output (dict): A dictionary containing key info about the app
+    """
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.get(f'https://apps.shopify.com/{app_identifier}/reviews')
     html = driver.page_source
