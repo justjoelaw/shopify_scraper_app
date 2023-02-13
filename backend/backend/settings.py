@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +26,7 @@ REAL_BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0br#kzasc@grepxkm2((g%(ri*iwc*ekvg$3x&m!@ivt99gyen'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -124,7 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT =  os.path.join(REAL_BASE_DIR, 'frontend/build')
+STATIC_ROOT = os.path.join(REAL_BASE_DIR, 'frontend/build')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -137,8 +140,8 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 
-MEDIA_ROOT = os.path.join(REAL_BASE_DIR,'mediafiles/')
+MEDIA_ROOT = os.path.join(REAL_BASE_DIR, 'mediafiles/')
 
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS= [ os.path.join(REAL_BASE_DIR,'frontend/build/static') ]
+STATICFILES_DIRS = [os.path.join(REAL_BASE_DIR, 'frontend/build/static')]

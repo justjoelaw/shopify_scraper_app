@@ -9,7 +9,7 @@ urlpatterns = [
     path('apps/<int:app_id>/reviews',
          views.AppReviewList.as_view(), name='app_review_list'),
     path('apps/<int:app_id>/reviews/data',
-         views.get_app_review_data, name='get_app_review_data'),
+         views.GetAppReviewDataView.as_view(), name='get_app_review_data'),
     path('verify_app/<str:app_identifier>',
          views.verify_app, name='verify_app'),
     path('apps', views.AppList.as_view(), name='app_list'),

@@ -7,6 +7,7 @@ from shopify_scraper.scraper.verify_shopify_app import verify_shopify_app
 from datetime import datetime
 from rest_framework import generics
 import pandas as pd
+from rest_framework.views import APIView
 
 
 @api_view(['POST'])
@@ -41,7 +42,14 @@ def verify_app(request, app_identifier: str):
     Used to prevent jobs being created for invalid app_identifiers
 
     """
-    shop_details = verify_shopify_app(app_identifier)
+    try:
+        shop_details = verify_shopify_app(app_identifier)
+    except AttributeError:
+        return Response(status=200, data={
+            'verified': False,
+            'message': 'App not found',
+            'data': {}
+        })
 
     return Response(status=200, data={
         'verified': True,
@@ -133,6 +141,7 @@ class AppReviewList(generics.ListAPIView):
 
     def get_queryset(self):
         app_id = self.kwargs.get('app_id')
+        test = self.queryset
         return self.queryset.filter(app__id=app_id)
 
     def list(self, request, *args, **kwargs):
@@ -146,35 +155,43 @@ class AppReviewList(generics.ListAPIView):
         return Response(data)
 
 
-@api_view(['GET'])
-def get_app_review_data(request, app_id):
+class GetAppReviewDataView(APIView):
     """Returns app review data, aggregated for building frontend charts
     """
-    reviews = App.objects.get(pk=app_id).reviews.all().order_by('review_date')
-    df = pd.DataFrame(list(reviews.values('rating', 'review_date')))
 
-    df['quarter_start'] = df['review_date'].dt.to_period("Q").dt.start_time
-    quarter_aggregated = df.groupby('quarter_start')[
-        'rating'].agg(['count', 'mean'])
-    quarter_aggregated.index = quarter_aggregated.index.strftime('%Y-%m-%d')
+    def get_app_reviews(self, app_id):
+        app = App.objects.get(pk=app_id)
+        return app.reviews.all().order_by('review_date')
 
-    df['month_start'] = df['review_date'].dt.to_period("M").dt.start_time
-    month_aggregated = df.groupby('month_start')[
-        'rating'].agg(['count', 'mean'])
-    month_aggregated.index = month_aggregated.index.strftime('%Y-%m-%d')
+    def get(self, request, app_id):
+        reviews = self.get_app_reviews(app_id)
+        df = pd.DataFrame(list(reviews.values('rating', 'review_date')))
 
-    df['week_start'] = df['review_date'].dt.to_period("W").dt.start_time
-    week_aggregated = df.groupby('week_start')['rating'].agg(['count', 'mean'])
-    week_aggregated.index = week_aggregated.index.strftime('%Y-%m-%d')
+        df['quarter_start'] = df['review_date'].dt.to_period("Q").dt.start_time
+        quarter_aggregated = df.groupby('quarter_start')[
+            'rating'].agg(['count', 'mean'])
+        quarter_aggregated.index = quarter_aggregated.index.strftime(
+            '%Y-%m-%d')
 
-    day_aggregated = df.groupby('review_date')['rating'].agg(['count', 'mean'])
-    day_aggregated.index = day_aggregated.index.strftime('%Y-%m-%d')
+        df['month_start'] = df['review_date'].dt.to_period("M").dt.start_time
+        month_aggregated = df.groupby('month_start')[
+            'rating'].agg(['count', 'mean'])
+        month_aggregated.index = month_aggregated.index.strftime('%Y-%m-%d')
 
-    return Response(status=200, data={
-        'rating_count': len(reviews),
-        'reviews_average_rating': round(sum([review.rating for review in reviews.all()])/len(reviews), 2),
-        'day_aggregated': day_aggregated.to_dict(),
-        'week_aggregated': week_aggregated.to_dict(),
-        'month_aggregated': month_aggregated.to_dict(),
-        'quarter_aggregated': quarter_aggregated.to_dict()
-    })
+        df['week_start'] = df['review_date'].dt.to_period("W").dt.start_time
+        week_aggregated = df.groupby('week_start')[
+            'rating'].agg(['count', 'mean'])
+        week_aggregated.index = week_aggregated.index.strftime('%Y-%m-%d')
+
+        day_aggregated = df.groupby('review_date')[
+            'rating'].agg(['count', 'mean'])
+        day_aggregated.index = day_aggregated.index.strftime('%Y-%m-%d')
+
+        return Response(status=200, data={
+            'rating_count': len(reviews),
+            'reviews_average_rating': round(sum([review.rating for review in reviews.all()])/len(reviews), 2),
+            'day_aggregated': day_aggregated.to_dict(),
+            'week_aggregated': week_aggregated.to_dict(),
+            'month_aggregated': month_aggregated.to_dict(),
+            'quarter_aggregated': quarter_aggregated.to_dict()
+        })
