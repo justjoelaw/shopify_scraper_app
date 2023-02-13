@@ -11,3 +11,8 @@ The app employs the following technologies:
 - Selenium & BeautifulSoup - webscraping
 - React - frontend
 
+
+## Prequisites
+- [Git](https://git-scm.com/downloads)
+- [Python 3.x](https://www.python.org/downloads/)
+- [Node.js](https://nodejs.org/en/download/)
