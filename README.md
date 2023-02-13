@@ -19,6 +19,10 @@ The tool comprises of two main screens: Jobs and Data:
 - Add jobs to scrape apps:
 <img src="https://user-images.githubusercontent.com/57088672/218507874-13eb686b-ed02-4728-8f1c-98ec83fb6015.gif" width="800">
 
+- Run jobs and view review data over time:
+<img src="https://user-images.githubusercontent.com/57088672/218510737-e141baa4-7330-4eff-9842-0641ae576ade.gif" width="800">
+
+
 
 ## Installation
 
