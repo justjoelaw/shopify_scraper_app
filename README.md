@@ -6,7 +6,7 @@
 
 I built this project primarily to get some hands-on practice using React, focusing on a real-world problem I had encountered.
 The app employs the following technologies:
-- Django - as a backend
+- Django - backend
 - Django Rest Framework - REST API
 - Selenium & BeautifulSoup - webscraping
 - React - frontend
