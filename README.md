@@ -16,6 +16,9 @@ The app employs the following technologies:
 The tool comprises of two main screens: Jobs and Data:
 ![image](https://user-images.githubusercontent.com/57088672/218487728-c4176c01-c2b8-474a-a9b0-8e40627c47ee.png)
 
+- Add jobs to scrape apps:
+<img src="https://user-images.githubusercontent.com/57088672/218507874-13eb686b-ed02-4728-8f1c-98ec83fb6015.gif" width="800">
+
 
 ## Installation
 
