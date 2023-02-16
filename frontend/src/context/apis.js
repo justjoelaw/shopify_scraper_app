@@ -61,6 +61,11 @@ function Provider({ children }) {
     return response;
   };
 
+  const deleteApp = async (appId) => {
+    const response = await axios.delete(`http://127.0.0.1:8000/api/apps/${appId}`);
+    return response;
+  };
+
   const editJob = async (job, newFrequency) => {
     const putBody = {
       ...job,
@@ -91,6 +96,7 @@ function Provider({ children }) {
     addApp,
     addJob,
     deleteJob,
+    deleteApp,
     editJob,
     startJob,
     fetchApps,

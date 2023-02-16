@@ -5,7 +5,7 @@ import { useContext, useState } from 'react';
 import APIContext from '../../context/apis';
 
 function JobsTable() {
-  const { deleteJob, fetchJobs, jobs, editJob, startJob } = useContext(APIContext);
+  const { deleteJob, deleteApp, fetchJobs, jobs, editJob, startJob } = useContext(APIContext);
   const [showDeleteConfirmIndex, setShowDeleteConfirmIndex] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
   const [jobFrequency, setJobFrequency] = useState(null);
@@ -14,8 +14,9 @@ function JobsTable() {
     setShowDeleteConfirmIndex(index);
   };
 
-  const handleDeleteConfirm = async (jobId) => {
+  const handleDeleteConfirm = async (jobId, appId) => {
     await deleteJob(jobId);
+    await deleteApp(appId);
     setShowDeleteConfirmIndex(null);
     fetchJobs();
   };
@@ -104,7 +105,7 @@ function JobsTable() {
                       <Button onClick={handleDeleteCancel} primary rounded>
                         Cancel
                       </Button>
-                      <Button onClick={() => handleDeleteConfirm(job.id)} danger rounded>
+                      <Button onClick={() => handleDeleteConfirm(job.id, job.app.id)} danger rounded>
                         Confirm
                       </Button>
                     </td>
