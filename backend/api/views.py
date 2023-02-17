@@ -1,13 +1,16 @@
-from shopify_scraper.models import Review, App, Job
+from shopify_scraper.models import Review, App, Job, User
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import ReviewSerializer, JobSerializer, AppSerializer, JobWithAppSerializer
+from .serializers import ReviewSerializer, JobSerializer, AppSerializer, JobWithAppSerializer, UserSerializer, LoginSerializer
 from shopify_scraper.scraper.shopify_app_scraper import shopify_app_scraper
 from shopify_scraper.scraper.verify_shopify_app import verify_shopify_app
 from datetime import datetime
 from rest_framework import generics
 import pandas as pd
 from rest_framework.views import APIView
+from rest_framework import permissions
+from django.contrib.auth import login
+from rest_framework import status
 
 
 @api_view(['POST'])
@@ -105,6 +108,14 @@ class AppList(generics.ListCreateAPIView):
         return Response(data)
 
 
+class AppListUser(AppList):
+    def get(self, request):
+        self.user = request.user
+        self.queryset = App.objects.filter(trackings__user=self.user)
+        self.serializer = self.get_serializer(self.queryset, many=True)
+        return self.list(request)
+
+
 class AppRUD(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update, destroy apps"""
     queryset = App.objects.all()
@@ -195,3 +206,36 @@ class GetAppReviewDataView(APIView):
             'month_aggregated': month_aggregated.to_dict(),
             'quarter_aggregated': quarter_aggregated.to_dict()
         })
+
+
+class UserList(generics.ListCreateAPIView):
+    """Retrieves lists of reviews and creates new reviews
+    Default list method is modified to:
+    - Return count of data under key 'count'
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def post(self, request, *args, **kwargs):
+        self.permission_classes = (permissions.AllowAny,)
+        return self.create(request, *args, **kwargs)
+
+
+class LoginView(APIView):
+    # This view should be accessible also for unauthenticated users.
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = LoginSerializer(data=self.request.data,
+                                     context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response(None, status=status.HTTP_202_ACCEPTED)
+
+
+class ProfileView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        return self.request.user

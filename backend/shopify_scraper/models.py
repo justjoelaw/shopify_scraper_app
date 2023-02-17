@@ -3,8 +3,13 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 import urllib.request
 from django.core.files.base import ContentFile
+from django.contrib.auth.models import AbstractUser
 
-User = get_user_model()
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+
+# User = get_user_model()
 
 # Create your models here.
 
@@ -38,9 +43,6 @@ class Job(models.Model):
         DAILY = 2, 'Daily'
 
     app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='jobs')
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='jobs')
-    frequency = models.IntegerField(choices=FrequencyEnum.choices)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     last_run_timestamp = models.DateTimeField(blank=True, null=True)

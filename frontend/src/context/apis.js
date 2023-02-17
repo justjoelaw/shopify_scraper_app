@@ -6,6 +6,7 @@ const APIContext = createContext();
 function Provider({ children }) {
   const [jobs, setJobs] = useState([]);
   const [apps, setApps] = useState([]);
+  const [userApps, setUserApps] = useState([]);
   const [reviewsCount, setReviewsCount] = useState(-1000);
   const [activeAppReviews, setActiveAppReviews] = useState([]);
   const [activeAppReviewsData, setActiveAppReviewsData] = useState([]);
@@ -19,6 +20,12 @@ function Provider({ children }) {
     const response = await axios.get('http://127.0.0.1:8000/api/apps');
     console.log(response.data.apps);
     setApps(response.data.apps);
+  };
+
+  const fetchAppsUser = async () => {
+    const response = await axios.get('http://127.0.0.1:8000/api/users/me/apps');
+    console.log(response.data.apps);
+    setUserApps(response.data.apps);
   };
 
   const fetchReviews = async () => {
@@ -104,6 +111,8 @@ function Provider({ children }) {
     activeAppReviews,
     fetchAppReviewsData,
     activeAppReviewsData,
+    fetchAppsUser,
+    userApps,
   };
 
   return <APIContext.Provider value={valueToShare}>{children}</APIContext.Provider>;

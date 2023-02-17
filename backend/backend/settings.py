@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -43,9 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',
-    'shopify_scraper'
+    'rest_framework',
+    'shopify_scraper',
+    'rest_framework_simplejwt.token_blacklist'
 
 ]
 
@@ -87,7 +89,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db_user_access.sqlite3',
     }
 }
 
@@ -134,9 +136,12 @@ STATIC_ROOT = os.path.join(REAL_BASE_DIR, 'frontend/build')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',  # for localhost (REACT Default)
     'http://localhost:8000',  # for localhost (Django Default)
+    'http://127.0.0.1:3000',  # for localhost (REACT Default)
+    'http://127.0.0.1:8000',  # for localhost (Django Default)
 )
 
 
@@ -145,3 +150,22 @@ MEDIA_ROOT = os.path.join(REAL_BASE_DIR, 'mediafiles/')
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [os.path.join(REAL_BASE_DIR, 'frontend/build/static')]
+
+AUTH_USER_MODEL = 'shopify_scraper.User'
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ],
+#     # 'DEFAULT_PERMISSION_CLASSES': [
+#     #     'rest_framework.permissions.IsAuthenticated',
+#     # ],
+# }
+
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+#     'ROTATE_REFRESH_TOKENS': True,
+#     'BLACKLIST_AFTER_ROTATION': True
+# }

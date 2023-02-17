@@ -19,7 +19,7 @@ function IndexButtonPanel() {
   return (
     <Panel className='flex flex-row justify-center flex-wrap'>
       <Button onClick={handleClickJobs} primary large rounded className='flex-grow mx-2'>
-        View Jobs
+        Add App
       </Button>
       <Button onClick={handleClickData} primary large rounded className='flex-grow mx-2'>
         View Data
