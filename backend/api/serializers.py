@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from shopify_scraper.models import Review, Job, App, User
+from shopify_scraper.models import Review, Job, App, User, Tracking
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -20,9 +20,12 @@ class AppSerializer(serializers.ModelSerializer):
         model = App
         fields = '__all__'
 
+class TrackingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tracking
+        fields = '__all__'
+
 # For attaching app data to Jobs endpoint
-
-
 class JobWithAppSerializer(serializers.ModelSerializer):
     app = AppSerializer()
 

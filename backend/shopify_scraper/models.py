@@ -38,11 +38,9 @@ class App(models.Model):
 
 
 class Job(models.Model):
-    class FrequencyEnum(models.IntegerChoices):
-        HOURLY = 1, 'Hourly'
-        DAILY = 2, 'Daily'
 
-    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='jobs')
+    app = models.OneToOneField(App, on_delete=models.CASCADE,
+                               related_name='jobs')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     last_run_timestamp = models.DateTimeField(blank=True, null=True)
@@ -55,6 +53,9 @@ class Tracking(models.Model):
         App, on_delete=models.CASCADE, related_name='trackings')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'app',)
 
 
 class Review(models.Model):

@@ -137,12 +137,23 @@ STATIC_ROOT = os.path.join(REAL_BASE_DIR, 'frontend/build')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-CORS_ORIGIN_WHITELIST = (
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # for localhost (REACT Default)
     'http://localhost:8000',  # for localhost (Django Default)
     'http://127.0.0.1:3000',  # for localhost (REACT Default)
     'http://127.0.0.1:8000',  # for localhost (Django Default)
-)
+    'http://127.0.0.1',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://localhost:8000',  # for localhost (Django Default)
+    'http://127.0.0.1:3000',  # for localhost (REACT Default)
+    'http://127.0.0.1:8000',  # for localhost (Django Default)
+    'http://127.0.0.1',
+]
 
 
 MEDIA_ROOT = os.path.join(REAL_BASE_DIR, 'mediafiles/')
@@ -153,19 +164,19 @@ STATICFILES_DIRS = [os.path.join(REAL_BASE_DIR, 'frontend/build/static')]
 
 AUTH_USER_MODEL = 'shopify_scraper.User'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ],
-#     # 'DEFAULT_PERMISSION_CLASSES': [
-#     #     'rest_framework.permissions.IsAuthenticated',
-#     # ],
-# }
-
-
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-#     'ROTATE_REFRESH_TOKENS': True,
-#     'BLACKLIST_AFTER_ROTATION': True
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '500/day'
+    }
+}

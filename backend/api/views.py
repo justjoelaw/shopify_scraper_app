@@ -1,7 +1,7 @@
-from shopify_scraper.models import Review, App, Job, User
+from shopify_scraper.models import Review, App, Job, User, Tracking
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import ReviewSerializer, JobSerializer, AppSerializer, JobWithAppSerializer, UserSerializer, LoginSerializer
+from .serializers import ReviewSerializer, JobSerializer, AppSerializer, JobWithAppSerializer, UserSerializer, TrackingSerializer
 from shopify_scraper.scraper.shopify_app_scraper import shopify_app_scraper
 from shopify_scraper.scraper.verify_shopify_app import verify_shopify_app
 from datetime import datetime
@@ -9,10 +9,32 @@ from rest_framework import generics
 import pandas as pd
 from rest_framework.views import APIView
 from rest_framework import permissions
-from django.contrib.auth import login
+from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+from django.contrib.auth.decorators import user_passes_test
+import functools
 
 
+def admin_method_decorator(class_view_method):
+    '''
+    Used to override methods within class-based views.
+    Makes the method only available for superusers
+    '''
+    @functools.wraps(class_view_method)
+    def wrapper(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            return class_view_method(self, request, *args, **kwargs)
+        else:
+            return Response(status=200, data={
+                'message': 'You do not have permissions on this object'
+            })
+    return wrapper
+
+
+@user_passes_test(lambda u: u.is_superuser)
 @api_view(['POST'])
 def start_job(request, job_id):
     """Runs the scraper for the specified job_id.
@@ -45,6 +67,7 @@ def verify_app(request, app_identifier: str):
     Used to prevent jobs being created for invalid app_identifiers
 
     """
+
     try:
         shop_details = verify_shopify_app(app_identifier)
     except AttributeError:
@@ -67,6 +90,8 @@ class JobList(generics.ListCreateAPIView):
     - Return count of data under key 'count'
     - Return the 'app' associated with each 'job'
     """
+    permission_classes = (permissions.IsAdminUser,)
+
     queryset = Job.objects.all()
 
     def get_serializer_class(self):
@@ -86,6 +111,8 @@ class JobList(generics.ListCreateAPIView):
 
 class JobRUD(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update, destroy jobs"""
+    permission_classes = (permissions.IsAdminUser,)
+
     queryset = Job.objects.all()
     serializer_class = JobSerializer
 
@@ -97,6 +124,47 @@ class AppList(generics.ListCreateAPIView):
     """
     queryset = App.objects.all()
     serializer_class = AppSerializer
+
+    def create(self, request, *args, **kwargs):
+        if len(Tracking.objects.filter(user=request.user)) >= 5:
+            return Response({'message': 'You can only track a maximum of 5 apps'}, status=status.HTTP_403_FORBIDDEN)
+
+        if len(App.objects.all()) >= 20:
+            return Response({'message': 'Temporary limit of 20 apps total for testing'}, status=status.HTTP_403_FORBIDDEN)
+
+        app_identifier = request.data['identifier']
+        try:
+            # Check if app already exists
+            app = App.objects.get(identifier=app_identifier)
+
+            obj, tracking_created = Tracking.objects.get_or_create(
+                app=app,
+                user=request.user
+            )
+
+            if not tracking_created:
+                return Response({'message': 'You are already tracking this app'}, status=status.HTTP_403_FORBIDDEN)
+
+            return Response(self.get_serializer(app).data)
+
+        except App.DoesNotExist:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            app = serializer.instance
+            Tracking.objects.create(
+                app=app,
+                user=request.user
+            )
+
+            # Create job as part of view - create via API is limited to superuser
+            Job.objects.create(
+                app=app
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -118,8 +186,19 @@ class AppListUser(AppList):
 
 class AppRUD(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update, destroy apps"""
+    permission_classes = (permissions.IsAdminUser,)
+
     queryset = App.objects.all()
     serializer_class = AppSerializer
+
+
+class TrackingRUD(generics.RetrieveUpdateDestroyAPIView):
+    """Retrieve, update, destroy apps"""
+
+    serializer_class = TrackingSerializer
+
+    def get_queryset(self):
+        return self.Tracking.objects.filter(user=self.request.user)
 
 
 class ReviewList(generics.ListCreateAPIView):
@@ -130,6 +209,10 @@ class ReviewList(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
+    @admin_method_decorator
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
@@ -138,6 +221,15 @@ class ReviewList(generics.ListCreateAPIView):
             "reviews": serializer.data,
         }
         return Response(data)
+
+
+class ReviewListUser(ReviewList):
+    def get(self, request):
+        self.user = request.user
+        apps = App.objects.filter(trackings__user=self.user)
+        self.queryset = Review.objects.filter(app__in=apps)
+        self.serializer = self.get_serializer(self.queryset, many=True)
+        return self.list(request)
 
 
 class AppReviewList(generics.ListAPIView):
@@ -152,7 +244,6 @@ class AppReviewList(generics.ListAPIView):
 
     def get_queryset(self):
         app_id = self.kwargs.get('app_id')
-        test = self.queryset
         return self.queryset.filter(app__id=app_id)
 
     def list(self, request, *args, **kwargs):
@@ -176,6 +267,16 @@ class GetAppReviewDataView(APIView):
 
     def get(self, request, app_id):
         reviews = self.get_app_reviews(app_id)
+        if len(reviews) == 0:
+            return Response(status=200, data={
+                'rating_count': len(reviews),
+                'reviews_average_rating': 0,
+                'day_aggregated': {},
+                'week_aggregated': {},
+                'month_aggregated': {},
+                'quarter_aggregated': {}
+            })
+
         df = pd.DataFrame(list(reviews.values('rating', 'review_date')))
 
         df['quarter_start'] = df['review_date'].dt.to_period("Q").dt.start_time
@@ -209,10 +310,10 @@ class GetAppReviewDataView(APIView):
 
 
 class UserList(generics.ListCreateAPIView):
-    """Retrieves lists of reviews and creates new reviews
-    Default list method is modified to:
-    - Return count of data under key 'count'
+    """Retrieves lists of users and creates new users
     """
+    permission_classes = (permissions.AllowAny,)
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -222,20 +323,52 @@ class UserList(generics.ListCreateAPIView):
 
 
 class LoginView(APIView):
-    # This view should be accessible also for unauthenticated users.
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
-        serializer = LoginSerializer(data=self.request.data,
-                                     context={'request': self.request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        login(request, user)
-        return Response(None, status=status.HTTP_202_ACCEPTED)
+        print(request)
+        username = request.data['username']
+        password = request.data['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return Response(UserSerializer(user).data, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(None, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        logout(request)
+        response = Response(None, status=status.HTTP_202_ACCEPTED)
+        response.delete_cookie('sessionid')
+        return response
 
 
 class ProfileView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        print(request.user)
+        response = super(ProfileView, self).get(request, *args, **kwargs)
+        response['Access-Control-Allow-Credentials'] = 'true'
+        return response
 
     def get_object(self):
+        print(self.request.user)
         return self.request.user
+
+
+@api_view(['DELETE'])
+def delete_tracking_by_app(request, app_id):
+    app = App.objects.get(pk=app_id)
+    tracking = Tracking.objects.filter(app=app, user=request.user)
+
+    tracking.delete()
+
+    return Response(status=200, data={
+        'message': 'Tracking deleted'
+    })
