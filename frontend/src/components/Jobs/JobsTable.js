@@ -1,7 +1,7 @@
 import Panel from '../Panel';
 import Button from '../Button';
 import { ImPencil, ImCross, ImCheckmark, ImPlay3 } from 'react-icons/im';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import APIContext from '../../context/apis';
 
 function JobsTable() {
@@ -9,6 +9,10 @@ function JobsTable() {
   const [showDeleteConfirmIndex, setShowDeleteConfirmIndex] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
   const [jobFrequency, setJobFrequency] = useState(null);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   const handleDelete = (index) => {
     setShowDeleteConfirmIndex(index);

@@ -7,24 +7,30 @@ import { useEffect, useContext } from 'react';
 import NavBar from '../components/NavBar';
 
 function IndexPage() {
-  const { fetchJobs, fetchReviews, fetchApps, fetchAppsUser } = useContext(APIContext);
-  const { fetchActiveUser } = useContext(UserContext);
+  const { fetchReviewsUser, fetchAppsUser } = useContext(APIContext);
+  const { activeUser, setActiveUser, fetchActiveUser } = useContext(UserContext);
 
   useEffect(() => {
-    fetchActiveUser();
-    fetchJobs();
-    fetchReviews();
-    fetchApps();
-    fetchAppsUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    async function setup() {
+      const response = await fetchActiveUser();
+      setActiveUser(response.data);
+    }
+    setup();
   }, []);
 
+  useEffect(() => {
+    if (activeUser) {
+      console.log(activeUser);
+      fetchAppsUser();
+      fetchReviewsUser();
+    }
+  }, [activeUser]);
+
   return (
-    <div className='columns-1 m-20'>
-      <NavBar />
+    <div>
       <IndexHeader />
-      <IndexButtonPanel />
-      <StatusPanel />
+      {activeUser && <IndexButtonPanel />}
+      {activeUser && <StatusPanel />}
     </div>
   );
 }

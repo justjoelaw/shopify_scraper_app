@@ -1,13 +1,19 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
+import Cookies from 'universal-cookie';
 
-axios.defaults.withCredentials = true;
+const cookies = new Cookies();
 
 const UserContext = createContext();
 
 function Provider({ children }) {
-  // const [activeUser, setActiveUser] = useState(null);
+  const [activeUser, setActiveUser] = useState(null);
+
+  useEffect(() => {
+    axios.defaults.headers.post['X-CSRFToken'] = cookies.get('csrftoken');
+    axios.defaults.headers.delete['X-CSRFToken'] = cookies.get('csrftoken');
+    axios.defaults.headers.put['X-CSRFToken'] = cookies.get('csrftoken');
+  }, [activeUser]);
 
   const registerUser = async (username, email, password) => {
     const postBody = {
@@ -23,36 +29,37 @@ function Provider({ children }) {
     }
   };
 
-  const getAccessToken = async (username, password) => {
+  const fetchActiveUser = async () => {
+    const response = await axios.get('http://127.0.0.1:8000/api/users/me', { withCredentials: true });
+    return response;
+  };
+
+  const login = async (username, password) => {
     const postBody = {
       username,
       password,
     };
-
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/token`, postBody, {
-        withCredentials: true,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'X-CSRFToken': Cookies.get('csrftoken'),
-          'Referrer-Policy': 'origin',
-        },
-      });
+      const response = await axios.post(`http://127.0.0.1:8000/api/login`, postBody, { withCredentials: true });
+      setActiveUser(response.data);
       return response;
     } catch (err) {
       return err.response;
     }
   };
 
-  const fetchActiveUser = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/me', {
-      withCredentials: true,
-    });
-    console.log(response);
+  const logout = async () => {
+    const postBody = {};
+    try {
+      const response = await axios.post(`http://127.0.0.1:8000/api/logout`, postBody, { withCredentials: true });
+      setActiveUser(null);
+      return response;
+    } catch (err) {
+      return err.response;
+    }
   };
 
-  const valueToShare = { registerUser, getAccessToken, fetchActiveUser };
+  const valueToShare = { registerUser, fetchActiveUser, login, logout, activeUser, setActiveUser };
 
   return <UserContext.Provider value={valueToShare}>{children}</UserContext.Provider>;
 }

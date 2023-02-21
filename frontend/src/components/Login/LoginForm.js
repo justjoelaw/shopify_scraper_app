@@ -4,12 +4,14 @@ import InputPassword from '../Forms/InputPassword';
 import Button from '../Button';
 import { useState, useContext } from 'react';
 import UserContext from '../../context/user';
+import ShowPageContext from '../../context/showPage';
 
 function LoginForm() {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  const { getAccessToken } = useContext(UserContext);
+  const { login } = useContext(UserContext);
+  const { hideAllPages, setShowIndexPage } = useContext(ShowPageContext);
 
   const handleUsernameChange = async (e) => {
     setLoginUsername(e.target.value);
@@ -21,8 +23,13 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await getAccessToken(loginUsername, loginPassword);
-    console.log(response);
+    const response = await login(loginUsername, loginPassword);
+    if (response.status === 202) {
+      hideAllPages();
+      setShowIndexPage(true);
+    } else {
+      alert('Incorrect username or password');
+    }
   };
 
   return (

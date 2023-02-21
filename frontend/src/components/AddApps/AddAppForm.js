@@ -4,27 +4,15 @@ import APIContext from '../../context/apis';
 import AppIcon from '../AppIcon';
 import Header from '../Header';
 
-const AddJobForm = ({ onSubmit }) => {
-  const { addApp, addJob, verifyApp, fetchJobs } = useContext(APIContext);
+const AddAppForm = () => {
+  const { addApp, addJob, verifyApp } = useContext(APIContext);
 
   const [appIdentifier, setAppIdentifier] = useState('');
-  const [jobFrequency, setJobFrequency] = useState(2);
-  const [showAddJobVerify, setShowAddJobVerify] = useState(true);
-  const [showAddJobSubmit, setShowAddJobSubmit] = useState(false);
+  const [showAddAppVerify, setShowAddAppVerify] = useState(true);
+  const [showAddAppSubmit, setShowAddAppSubmit] = useState(false);
   const [verifyButtonDisabled, setVerifyButtonDisabled] = useState(false);
   const [app, setApp] = useState({});
   const [newAppId, setNewAppId] = useState(null);
-
-  useEffect(() => {
-    const addJobEffect = async () => {
-      if (newAppId) {
-        await addJob(jobFrequency, newAppId);
-        fetchJobs();
-        onSubmit();
-      }
-    };
-    addJobEffect();
-  }, [newAppId]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
@@ -34,8 +22,8 @@ const AddJobForm = ({ onSubmit }) => {
     setVerifyButtonDisabled(false);
 
     if (response.data.verified) {
-      setShowAddJobVerify(false);
-      setShowAddJobSubmit(true);
+      setShowAddAppVerify(false);
+      setShowAddAppSubmit(true);
       setApp({
         ...response.data.data,
         appIdentifier,
@@ -47,11 +35,11 @@ const AddJobForm = ({ onSubmit }) => {
     e.preventDefault();
 
     const addAppResponse = await addApp(app);
-    console.log(addAppResponse.data.identifier);
-    if (addAppResponse.data.identifier[0] === 'app with this identifier already exists.') {
-      alert('You already have a job running for this app');
-    } else {
+    console.log(addAppResponse);
+    if ([200, 201].includes(addAppResponse.status)) {
       setNewAppId(addAppResponse.data.id);
+    } else {
+      alert(addAppResponse.data.message);
     }
   };
 
@@ -61,20 +49,12 @@ const AddJobForm = ({ onSubmit }) => {
         <label htmlFor='appIdentifier'>App Identifier:</label>
         <input type='text' id='appIdentifier' value={appIdentifier} onChange={(e) => setAppIdentifier(e.target.value)} />
       </div>
-      <div>
-        <label htmlFor='jobFrequency'>Frequency:</label>
-        <select id='jobFrequency' value={jobFrequency} onChange={(e) => setJobFrequency(e.target.value)}>
-          <option value=''>Select frequency</option>
-          <option value='1'>Hourly</option>
-          <option value='2'>Daily</option>
-        </select>
-      </div>
-      {showAddJobVerify && (
+      {showAddAppVerify && (
         <Button primary rounded disabled={verifyButtonDisabled} onClick={handleVerify}>
           Verify App
         </Button>
       )}
-      {showAddJobSubmit && (
+      {showAddAppSubmit && (
         <div>
           <Header size='h3'>App details:</Header>
           <div className='flex flex-row'>
@@ -98,4 +78,4 @@ const AddJobForm = ({ onSubmit }) => {
   );
 };
 
-export default AddJobForm;
+export default AddAppForm;
