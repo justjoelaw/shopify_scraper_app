@@ -32,7 +32,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
+                 'shopify-scraper-v2-dev.eu-west-2.elasticbeanstalk.com']
 
 
 # Application definition
@@ -47,7 +48,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'shopify_scraper',
-    'rest_framework_simplejwt.token_blacklist'
 
 ]
 
