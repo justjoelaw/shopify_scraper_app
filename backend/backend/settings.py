@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-from datetime import timedelta
 
 load_dotenv()
 
@@ -129,7 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(REAL_BASE_DIR, 'frontend/build')
+STATIC_ROOT = os.path.join(BASE_DIR, 'frontend_react_build')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -160,7 +159,7 @@ MEDIA_ROOT = os.path.join(REAL_BASE_DIR, 'mediafiles/')
 
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [os.path.join(REAL_BASE_DIR, 'frontend/build/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend_react_build/static')]
 
 AUTH_USER_MODEL = 'shopify_scraper.User'
 
