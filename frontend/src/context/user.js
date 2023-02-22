@@ -40,7 +40,7 @@ function Provider({ children }) {
       password,
     };
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/login`, postBody, { withCredentials: true });
+      const response = await axios.post(`api/login`, postBody, { withCredentials: true });
       setActiveUser(response.data);
       return response;
     } catch (err) {
