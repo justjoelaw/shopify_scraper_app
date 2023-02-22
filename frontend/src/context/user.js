@@ -22,7 +22,7 @@ function Provider({ children }) {
       password,
     };
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/users`, postBody);
+      const response = await axios.post(`/api/users`, postBody);
       return response;
     } catch (err) {
       return err.response;
@@ -51,7 +51,7 @@ function Provider({ children }) {
   const logout = async () => {
     const postBody = {};
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/logout`, postBody, { withCredentials: true });
+      const response = await axios.post(`/api/logout`, postBody, { withCredentials: true });
       setActiveUser(null);
       return response;
     } catch (err) {

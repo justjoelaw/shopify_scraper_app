@@ -13,34 +13,34 @@ function Provider({ children }) {
   const [activeAppReviewsData, setActiveAppReviewsData] = useState([]);
 
   const fetchJobs = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/jobs', { withCredentials: true });
+    const response = await axios.get('/api/jobs', { withCredentials: true });
     setJobs(response.data.jobs);
   };
 
   const fetchApps = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/apps', { withCredentials: true });
+    const response = await axios.get('/api/apps', { withCredentials: true });
     console.log(response.data.apps);
     setApps(response.data.apps);
   };
 
   const fetchAppsUser = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/me/apps', { withCredentials: true });
+    const response = await axios.get('/api/users/me/apps', { withCredentials: true });
     console.log(response.data.apps);
     setUserApps(response.data.apps);
   };
 
   const fetchReviews = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/reviews', { withCredentials: true });
+    const response = await axios.get('/api/reviews', { withCredentials: true });
     setReviewsCount(response.data.count);
   };
 
   const fetchReviewsUser = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/me/reviews', { withCredentials: true });
+    const response = await axios.get('/api/users/me/reviews', { withCredentials: true });
     setReviewsCount(response.data.count);
   };
 
   const verifyApp = async (appIdentifier) => {
-    const response = await axios.get(`http://127.0.0.1:8000/api/verify_app/${appIdentifier}`, { withCredentials: true });
+    const response = await axios.get(`/api/verify_app/${appIdentifier}`, { withCredentials: true });
     return response;
   };
 
@@ -51,7 +51,7 @@ function Provider({ children }) {
       image_url: app.image,
     };
     try {
-      const response = await axios.post(`http://127.0.0.1:8000/api/apps`, postBody, { withCredentials: true });
+      const response = await axios.post(`/api/apps`, postBody, { withCredentials: true });
       return response;
     } catch (err) {
       return err.response;
@@ -63,27 +63,27 @@ function Provider({ children }) {
       app: appId,
       last_run_timestamp: null,
     };
-    const response = await axios.post(`http://127.0.0.1:8000/api/jobs`, postBody, { withCredentials: true });
+    const response = await axios.post(`/api/jobs`, postBody, { withCredentials: true });
     return response;
   };
 
   const deleteJob = async (jobId) => {
-    const response = await axios.delete(`http://127.0.0.1:8000/api/jobs/${jobId}`, { withCredentials: true });
+    const response = await axios.delete(`/api/jobs/${jobId}`, { withCredentials: true });
     return response;
   };
 
   const deleteApp = async (appId) => {
-    const response = await axios.delete(`http://127.0.0.1:8000/api/apps/${appId}`, { withCredentials: true });
+    const response = await axios.delete(`/api/apps/${appId}`, { withCredentials: true });
     return response;
   };
 
   // const getTracking = async (appId) => {
-  //   const response = await get.delete(`http://127.0.0.1:8000/api/trackings/${trackingId}`, { withCredentials: true });
+  //   const response = await get.delete(`/api/trackings/${trackingId}`, { withCredentials: true });
   //   return response;
   // };
 
   const deleteTrackingByApp = async (appId) => {
-    const response = await axios.delete(`http://127.0.0.1:8000/api/app/${appId}/remove_tracking`, {
+    const response = await axios.delete(`/api/app/${appId}/remove_tracking`, {
       withCredentials: true,
     });
     return response;
@@ -95,17 +95,17 @@ function Provider({ children }) {
       app: job.app.id,
       frequency: newFrequency,
     };
-    const response = await axios.put(`http://127.0.0.1:8000/api/jobs/${job.id}`, putBody, { withCredentials: true });
+    const response = await axios.put(`/api/jobs/${job.id}`, putBody, { withCredentials: true });
     return response;
   };
 
   const startJob = async (jobId) => {
-    const response = await axios.post(`http://127.0.0.1:8000/api/jobs/${jobId}/start`, { withCredentials: true });
+    const response = await axios.post(`/api/jobs/${jobId}/start`, { withCredentials: true });
     return response;
   };
 
   const fetchAppReviewsData = async (appId) => {
-    const response = await axios.get(`http://127.0.0.1:8000/api/apps/${appId}/reviews/data`, { withCredentials: true });
+    const response = await axios.get(`/api/apps/${appId}/reviews/data`, { withCredentials: true });
     console.log('Running fetchAppReviewsData');
     setActiveAppReviewsData(response);
     console.log(response);
