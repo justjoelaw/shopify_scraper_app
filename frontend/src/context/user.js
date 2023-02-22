@@ -30,7 +30,7 @@ function Provider({ children }) {
   };
 
   const fetchActiveUser = async () => {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/me', { withCredentials: true });
+    const response = await axios.get('/api/users/me', { withCredentials: true });
     return response;
   };
 
