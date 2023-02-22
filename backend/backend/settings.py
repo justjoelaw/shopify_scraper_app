@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
-                 'shopify-scraper-v3-dev.eu-west-2.elasticbeanstalk.com']
+                 'shopify-scraper-v3-dev.eu-west-2.elasticbeanstalk.com', '172.31.28.124']
 
 
 # Application definition
