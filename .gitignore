@@ -198,3 +198,5 @@ mediafiles
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+.shopify-scraper-venv/
+scraper_lambda_function
