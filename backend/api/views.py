@@ -249,9 +249,11 @@ class ReviewList(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
+            x = request.META.get('REVIEWS_CREATE_TOKEN')
+            y = os.environ['REVIEWS_CREATE_TOKEN']
             if request.META.get('REVIEWS_CREATE_TOKEN') != os.environ['REVIEWS_CREATE_TOKEN']:
                 return Response(status=403, data={
-                    'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not correct'})
+                    'message': f'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not correct {x} {y}'})
         except KeyError:
             return Response(status=403, data={
                 'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not provided'})
