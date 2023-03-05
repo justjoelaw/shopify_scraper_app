@@ -1,12 +1,23 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from shopify_scraper.models import Review, Job, App, User, Tracking
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
+
+
+class ReviewListSerializer(serializers.ListSerializer):
+
+    def create(self, validated_data):
+        items = [Review(**item) for item in validated_data]
+        return Review.objects.bulk_create(items, ignore_conflicts=True)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Review
         fields = '__all__'
+        list_serializer_class = ReviewListSerializer
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -20,12 +31,15 @@ class AppSerializer(serializers.ModelSerializer):
         model = App
         fields = '__all__'
 
+
 class TrackingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tracking
         fields = '__all__'
 
 # For attaching app data to Jobs endpoint
+
+
 class JobWithAppSerializer(serializers.ModelSerializer):
     app = AppSerializer()
 

@@ -16,6 +16,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 import functools
+import boto3
+import json
 
 
 def admin_method_decorator(class_view_method):
@@ -59,6 +61,56 @@ def start_job(request, job_id):
         )
 
     return Response(status=200)
+
+
+@api_view(['POST'])
+def start_job_lambda(request, job_id):
+    """Runs the scraper for the specified job_id.
+    """
+    job = Job.objects.get(pk=job_id)
+    app_identifier = job.app.identifier
+    app_id = job.app.id
+    last_run_timestamp = job.last_run_timestamp
+
+    now = datetime.now()
+
+    body_dict = {
+        'app_identifier': app_identifier,
+        'last_run_timestamp': last_run_timestamp,
+        'app_id': app_id
+    }
+
+    sqs = boto3.client('sqs', region_name='eu-west-2')
+    queue_url = 'https://sqs.eu-west-2.amazonaws.com/307765359076/test_shopify_queue.fifo'
+    response = sqs.send_message(
+        QueueUrl=queue_url,
+        MessageBody=json.dumps(body_dict),
+        MessageGroupId=str(job.app.id) + 'foo',
+        MessageDeduplicationId=str(job.app.id) + str(last_run_timestamp)
+    )
+
+    return Response(
+        status=200,
+        data={
+            'sqs_response': response
+        }
+    )
+
+    # reviews = shopify_app_scraper(app_identifier, job.last_run_timestamp)
+    # job.last_run_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
+    # job.save()
+
+    # for review in reviews:
+    #     review, created = Review.objects.get_or_create(
+    #         comment=review['comment'],
+    #         rating=review['rating'],
+    #         review_id=review['review_id'],
+    #         review_date=review['date'],
+    #         review_author=review['shop_name'],
+    #         app=job.app
+    #     )
+
+    # return Response(status=200)
 
 
 @api_view(['GET'])
@@ -208,10 +260,26 @@ class ReviewList(generics.ListCreateAPIView):
     """
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = (permissions.AllowAny,)
 
-    @admin_method_decorator
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        app = App.objects.get(pk=data[0]['app'])
+
+        created_count = 0
+        for review in data:
+            obj, created = Review.objects.get_or_create(
+                comment=review['comment'],
+                rating=review['rating'],
+                review_id=review['review_id'],
+                review_date=review['review_date'],
+                review_author=review['review_author'],
+                app=app
+            )
+            if created:
+                created_count += 1
+        return Response(status=200, data={
+            'reviews_created': created_count})
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -362,7 +430,7 @@ class ProfileView(generics.RetrieveAPIView):
         return self.request.user
 
 
-@api_view(['DELETE'])
+@ api_view(['DELETE'])
 def delete_tracking_by_app(request, app_id):
     app = App.objects.get(pk=app_id)
     tracking = Tracking.objects.filter(app=app, user=request.user)

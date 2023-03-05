@@ -28,7 +28,7 @@ class App(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Custom save method which fetchs the image_file from the image_url, if image_file does not exist
+        Custom save method which fetches the image_file from the image_url, if image_file does not exist
         """
         if self.image_url and not self.image_file:
             image = urllib.request.urlopen(self.image_url).read()
