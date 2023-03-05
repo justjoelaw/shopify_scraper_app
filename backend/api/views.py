@@ -249,7 +249,7 @@ class ReviewList(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            x = request.META.get('REVIEWS_CREATE_TOKEN')
+            x = request.META
             y = os.environ['REVIEWS_CREATE_TOKEN']
             if request.META.get('REVIEWS_CREATE_TOKEN') != os.environ['REVIEWS_CREATE_TOKEN']:
                 return Response(status=403, data={
