@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import user_passes_test
 import functools
 import boto3
 import json
+import os
 
 
 def admin_method_decorator(class_view_method):
@@ -95,22 +96,6 @@ def start_job_lambda(request, job_id):
             'sqs_response': response
         }
     )
-
-    # reviews = shopify_app_scraper(app_identifier, job.last_run_timestamp)
-    # job.last_run_timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
-    # job.save()
-
-    # for review in reviews:
-    #     review, created = Review.objects.get_or_create(
-    #         comment=review['comment'],
-    #         rating=review['rating'],
-    #         review_id=review['review_id'],
-    #         review_date=review['date'],
-    #         review_author=review['shop_name'],
-    #         app=job.app
-    #     )
-
-    # return Response(status=200)
 
 
 @api_view(['GET'])
@@ -263,6 +248,14 @@ class ReviewList(generics.ListCreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
     def create(self, request, *args, **kwargs):
+        try:
+            if request.META.get('REVIEWS_CREATE_TOKEN') != os.environ['REVIEWS_CREATE_TOKEN']:
+                return Response(status=403, data={
+                    'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not provided'})
+        except KeyError:
+            return Response(status=403, data={
+                'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not provided'})
+
         data = request.data
         app = App.objects.get(pk=data[0]['app'])
 
@@ -282,6 +275,7 @@ class ReviewList(generics.ListCreateAPIView):
             'reviews_created': created_count})
 
     def list(self, request):
+        print(request)
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         data = {

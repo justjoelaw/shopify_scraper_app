@@ -1,1 +1,23 @@
-{"Records": [{"messageId": "9c429acc-b654-4d5c-bbf9-d5ea4a520587", "receiptHandle": "AQEBk4pzuix5RW/1yTJEKpq532wBsSWLRX+T5Ezc5nO7I8ePGmhqEIg7xo8zdwBeJjq0vG13PqsYLCaKmx0SPqRMqi6qvsmi9ObSiYxP3Vs1KBD9WphnojGlk7Cje0a0vka4S8ShelXEyxpuxnaGpEjD2If6IsDm9Nd9fFfTX0VIYig/TADgajGRKgzpAA93k1xYWqUmd3s1bYkaBh87Qx0U1ibQXNw0W2N9MPJzIqqhg+SU3kH+t1yAejnQxdiTVxqLSvpgim2LocdK/Aw1geOjCs+ArM9bVDQ2hFS+P3/Y6cU=", "body": "{"app_identifier": "collabs", "last_run_timestamp": null}", "attributes": {"ApproximateReceiveCount": "1", "SentTimestamp": "1677668603331", "SequenceNumber": "37322971309871839232", "MessageGroupId": "1", "SenderId": "AIDAUPKB6WHSHMDW2Y4ZT", "MessageDeduplicationId": "1", "ApproximateFirstReceiveTimestamp": "1677668603331"}, "messageAttributes": {}, "md5OfBody": "21113ccd03aa92e651dfcba1b7b9fffd", "eventSource": "aws:sqs", "eventSourceARN": "arn:aws:sqs:eu-west-2:307765359076:test_shopify_queue.fifo", "awsRegion": "eu-west-2"}]}
+{
+    "Records": [
+        {
+            "messageId": "9c429acc-b654-4d5c-bbf9-d5ea4a520587",
+            "receiptHandle": "AQEBk4pzuix5RW/1yTJEKpq532wBsSWLRX+T5Ezc5nO7I8ePGmhqEIg7xo8zdwBeJjq0vG13PqsYLCaKmx0SPqRMqi6qvsmi9ObSiYxP3Vs1KBD9WphnojGlk7Cje0a0vka4S8ShelXEyxpuxnaGpEjD2If6IsDm9Nd9fFfTX0VIYig/TADgajGRKgzpAA93k1xYWqUmd3s1bYkaBh87Qx0U1ibQXNw0W2N9MPJzIqqhg+SU3kH+t1yAejnQxdiTVxqLSvpgim2LocdK/Aw1geOjCs+ArM9bVDQ2hFS+P3/Y6cU=",
+            "body": "{\"app_identifier\": \"collabs\", \"last_run_timestamp\": null}",
+            "attributes": {
+                "ApproximateReceiveCount": "1",
+                "SentTimestamp": "1677668603331",
+                "SequenceNumber": "37322971309871839232",
+                "MessageGroupId": "1",
+                "SenderId": "AIDAUPKB6WHSHMDW2Y4ZT",
+                "MessageDeduplicationId": "1",
+                "ApproximateFirstReceiveTimestamp": "1677668603331"
+            },
+            "messageAttributes": {},
+            "md5OfBody": "21113ccd03aa92e651dfcba1b7b9fffd",
+            "eventSource": "aws:sqs",
+            "eventSourceARN": "arn:aws:sqs:eu-west-2:307765359076:test_shopify_queue.fifo",
+            "awsRegion": "eu-west-2"
+        }
+    ]
+}
