@@ -197,11 +197,14 @@ class AppList(generics.ListCreateAPIView):
             )
 
             # Create job as part of view - create via API is limited to superuser
-            Job.objects.create(
+            job = Job.objects.create(
                 app=app
             )
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(data={
+                'app': serializer.data,
+                'job_id': job.id
+            }, status=status.HTTP_201_CREATED, headers=headers)
 
     def list(self, request):
         queryset = self.get_queryset()

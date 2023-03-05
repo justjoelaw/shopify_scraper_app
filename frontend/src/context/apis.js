@@ -104,6 +104,11 @@ function Provider({ children }) {
     return response;
   };
 
+  const startJobLambda = async (jobId) => {
+    const response = await axios.post(`/api/jobs/${jobId}/start_lambda`, { withCredentials: true });
+    return response;
+  };
+
   const fetchAppReviewsData = async (appId) => {
     const response = await axios.get(`/api/apps/${appId}/reviews/data`, { withCredentials: true });
     console.log('Running fetchAppReviewsData');
@@ -133,6 +138,7 @@ function Provider({ children }) {
     userApps,
     fetchReviewsUser,
     deleteTrackingByApp,
+    startJobLambda,
   };
 
   return <APIContext.Provider value={valueToShare}>{children}</APIContext.Provider>;
