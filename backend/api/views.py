@@ -125,7 +125,7 @@ class JobList(generics.ListCreateAPIView):
     - Return count of data under key 'count'
     - Return the 'app' associated with each 'job'
     """
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.AllowAny,)
 
     queryset = Job.objects.all()
 
@@ -133,6 +133,10 @@ class JobList(generics.ListCreateAPIView):
         if self.request.method == 'GET':
             return JobWithAppSerializer
         return JobSerializer
+
+    @admin_method_decorator
+    def post(self, request):
+        super().post(self, request)
 
     def list(self, request):
         queryset = self.get_queryset()
