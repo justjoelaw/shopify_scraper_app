@@ -23,7 +23,7 @@ class TrackingAdmin(admin.ModelAdmin):
     list_display = ('user', 'app')
 
 
-@admin.register(user)
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'is_superuser',
                     'date_joined', 'last_login')
