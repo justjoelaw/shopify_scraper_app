@@ -86,7 +86,7 @@ def start_job_lambda(request, job_id):
     response = sqs.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(body_dict),
-        MessageGroupId=str(job.app.id) + 'foo',
+        MessageGroupId=str(job.app.id),
         MessageDeduplicationId=str(job.app.id) + str(last_run_timestamp)
     )
 
