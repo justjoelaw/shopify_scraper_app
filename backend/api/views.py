@@ -251,7 +251,7 @@ class ReviewList(generics.ListCreateAPIView):
         try:
             if request.META.get('REVIEWS_CREATE_TOKEN') != os.environ['REVIEWS_CREATE_TOKEN']:
                 return Response(status=403, data={
-                    'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not provided'})
+                    'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not correct'})
         except KeyError:
             return Response(status=403, data={
                 'message': 'You are not authorised to create reviews. REVIEWS_CREATE_TOKEN not provided'})
