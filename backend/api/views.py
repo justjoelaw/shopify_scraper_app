@@ -73,8 +73,6 @@ def start_job_lambda(request, job_id):
     app_id = job.app.id
     last_run_timestamp = job.last_run_timestamp
 
-    now = datetime.now()
-
     body_dict = {
         'app_identifier': app_identifier,
         'last_run_timestamp': last_run_timestamp,
@@ -274,6 +272,12 @@ class ReviewList(generics.ListCreateAPIView):
             )
             if created:
                 created_count += 1
+
+        job = Job.objects.get(app_id=app.id)
+        now = datetime.now()
+        job.last_run_timestamp = now.strftime("%Y-%m-%d")
+        job.save()
+
         return Response(status=200, data={
             'reviews_created': created_count})
 
