@@ -5,7 +5,7 @@ import AppIcon from '../AppIcon';
 import Header from '../Header';
 
 const AddAppForm = () => {
-  const { addApp, addJob, verifyApp } = useContext(APIContext);
+  const { addApp, addJob, verifyApp, startJobLambda } = useContext(APIContext);
 
   const [appIdentifier, setAppIdentifier] = useState('');
   const [showAddAppVerify, setShowAddAppVerify] = useState(true);
@@ -35,9 +35,11 @@ const AddAppForm = () => {
     e.preventDefault();
 
     const addAppResponse = await addApp(app);
+    const jobId = addAppResponse.data.job_id;
     console.log(addAppResponse);
     if ([200, 201].includes(addAppResponse.status)) {
-      setNewAppId(addAppResponse.data.id);
+      setNewAppId(addAppResponse.data.app.id);
+      startJobLambda(jobId);
     } else {
       alert(addAppResponse.data.message);
     }
