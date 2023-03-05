@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Job, App, Tracking
+from .models import Job, App, Tracking, User
 
 # Register your models here.
 
@@ -21,3 +21,9 @@ class AppAdmin(admin.ModelAdmin):
 @admin.register(Tracking)
 class TrackingAdmin(admin.ModelAdmin):
     list_display = ('user', 'app')
+
+
+@admin.register(user)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'is_superuser',
+                    'date_joined', 'last_login')
