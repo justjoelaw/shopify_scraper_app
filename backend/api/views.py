@@ -79,13 +79,15 @@ def start_job_lambda(request, job_id):
         'app_id': app_id
     }
 
+    # Allows 1 run per app, per day
+    deduplication_id = str(job.app.id) + str(last_run_timestamp).split(' ')[0]
     sqs = boto3.client('sqs', region_name='eu-west-2')
     queue_url = 'https://sqs.eu-west-2.amazonaws.com/307765359076/test_shopify_queue.fifo'
     response = sqs.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(body_dict),
         MessageGroupId=str(job.app.id),
-        MessageDeduplicationId=str(job.app.id) + str(last_run_timestamp)
+        MessageDeduplicationId=deduplication_id
     )
 
     return Response(
