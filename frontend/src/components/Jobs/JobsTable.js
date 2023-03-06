@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import APIContext from '../../context/apis';
 
 function JobsTable() {
-  const { deleteJob, deleteApp, fetchJobs, jobs, editJob, startJob } = useContext(APIContext);
+  const { deleteJob, deleteApp, fetchJobs, jobs, editJob, startJobLambda } = useContext(APIContext);
   const [showDeleteConfirmIndex, setShowDeleteConfirmIndex] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
   const [jobFrequency, setJobFrequency] = useState(null);
@@ -43,7 +43,7 @@ function JobsTable() {
   };
 
   const handleStartJob = async (jobId) => {
-    await startJob(jobId);
+    await startJobLambda(jobId);
     fetchJobs();
   };
 
