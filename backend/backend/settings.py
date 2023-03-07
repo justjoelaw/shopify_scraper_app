@@ -29,10 +29,10 @@ REAL_BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
-                 'shopify-scraper-v3-dev.eu-west-2.elasticbeanstalk.com', '172.31.28.124']
+                 'shopify-scraper-v3-dev.eu-west-2.elasticbeanstalk.com']
 
 
 # Application definition
