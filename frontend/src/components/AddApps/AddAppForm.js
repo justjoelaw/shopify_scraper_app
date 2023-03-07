@@ -36,11 +36,14 @@ const AddAppForm = () => {
 
     const addAppResponse = await addApp(app);
     console.log(addAppResponse);
-    const jobId = addAppResponse.data.job_id;
-    if ([200, 201].includes(addAppResponse.status)) {
+    if (addAppResponse.status === 200) {
       setNewAppId(addAppResponse.data.id);
-      startJobLambda(jobId);
+      alert("App added. Check the 'View Data' page for reviews");
+    } else if (addAppResponse.status === 201) {
+      setNewAppId(addAppResponse.data.app.id);
+      const jobId = addAppResponse.data.job_id;
       alert("App added. Scraping data may take a few minutes. Check the 'View Data' page for progress");
+      startJobLambda(jobId);
     } else {
       alert(addAppResponse.data.message);
     }
