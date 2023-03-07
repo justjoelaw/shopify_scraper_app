@@ -35,6 +35,7 @@ const AddAppForm = () => {
     e.preventDefault();
 
     const addAppResponse = await addApp(app);
+    console.log(addAppResponse);
     const jobId = addAppResponse.data.job_id;
     if ([200, 201].includes(addAppResponse.status)) {
       setNewAppId(addAppResponse.data.app.id);

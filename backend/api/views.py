@@ -11,9 +11,6 @@ from rest_framework.views import APIView
 from rest_framework import permissions
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
-from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 import functools
 import boto3
