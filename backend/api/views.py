@@ -75,7 +75,7 @@ def start_job_lambda(request, job_id):
 
     body_dict = {
         'app_identifier': app_identifier,
-        'last_run_timestamp': str(last_run_timestamp),
+        'last_run_timestamp': str(last_run_timestamp) if last_run_timestamp else None,
         'app_id': app_id
     }
 
