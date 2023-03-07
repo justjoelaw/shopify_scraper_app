@@ -38,7 +38,7 @@ const AddAppForm = () => {
     console.log(addAppResponse);
     const jobId = addAppResponse.data.job_id;
     if ([200, 201].includes(addAppResponse.status)) {
-      setNewAppId(addAppResponse.data.app.id);
+      setNewAppId(addAppResponse.data.id);
       startJobLambda(jobId);
       alert("App added. Scraping data may take a few minutes. Check the 'View Data' page for progress");
     } else {
