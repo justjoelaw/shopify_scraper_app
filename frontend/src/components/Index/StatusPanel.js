@@ -1,6 +1,5 @@
 import Panel from '../Panel';
 import Header from '../Header';
-import NavBar from '../NavBar';
 import { useContext } from 'react';
 import APIContext from '../../context/apis';
 

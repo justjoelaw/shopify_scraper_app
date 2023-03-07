@@ -1,6 +1,5 @@
 import { createContext, useState } from 'react';
 import axios from 'axios';
-import Cookies from 'universal-cookie';
 
 const APIContext = createContext();
 
@@ -19,13 +18,11 @@ function Provider({ children }) {
 
   const fetchApps = async () => {
     const response = await axios.get('/api/apps', { withCredentials: true });
-    console.log(response.data.apps);
     setApps(response.data.apps);
   };
 
   const fetchAppsUser = async () => {
     const response = await axios.get('/api/users/me/apps', { withCredentials: true });
-    console.log(response.data.apps);
     setUserApps(response.data.apps);
   };
 
@@ -77,11 +74,6 @@ function Provider({ children }) {
     return response;
   };
 
-  // const getTracking = async (appId) => {
-  //   const response = await get.delete(`/api/trackings/${trackingId}`, { withCredentials: true });
-  //   return response;
-  // };
-
   const deleteTrackingByApp = async (appId) => {
     const response = await axios.delete(`/api/app/${appId}/remove_tracking`, {
       withCredentials: true,
@@ -111,9 +103,7 @@ function Provider({ children }) {
 
   const fetchAppReviewsData = async (appId) => {
     const response = await axios.get(`/api/apps/${appId}/reviews/data`, { withCredentials: true });
-    console.log('Running fetchAppReviewsData');
     setActiveAppReviewsData(response);
-    console.log(response);
     return response;
   };
 

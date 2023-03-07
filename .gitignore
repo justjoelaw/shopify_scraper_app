@@ -200,3 +200,5 @@ mediafiles
 
 .shopify-scraper-venv/
 scraper_lambda_function
+
+db_user_access.sqlite3

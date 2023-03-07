@@ -4,7 +4,6 @@ import StatusPanel from '../components/Index/StatusPanel';
 import APIContext from '../context/apis';
 import UserContext from '../context/user';
 import { useEffect, useContext } from 'react';
-import NavBar from '../components/NavBar';
 
 function IndexPage() {
   const { fetchReviewsUser, fetchAppsUser } = useContext(APIContext);
@@ -20,7 +19,6 @@ function IndexPage() {
 
   useEffect(() => {
     if (activeUser) {
-      console.log(activeUser);
       fetchAppsUser();
       fetchReviewsUser();
     }

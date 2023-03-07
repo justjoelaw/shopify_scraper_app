@@ -3,7 +3,8 @@ from django.urls import path
 
 urlpatterns = [
     path('jobs/<int:job_id>/start', views.start_job, name='start_job'),
-    path('jobs/<int:job_id>/start_lambda', views.start_job_lambda, name='start_job_lambda'),
+    path('jobs/<int:job_id>/start_lambda',
+         views.start_job_lambda, name='start_job_lambda'),
     path('jobs', views.JobList.as_view(), name='job_list'),
     path('jobs/<int:pk>', views.JobRUD.as_view(), name='job_detail'),
     path('trackings/<int:pk>', views.TrackingRUD.as_view(), name='tracking_detail'),

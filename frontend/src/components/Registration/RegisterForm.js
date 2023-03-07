@@ -55,7 +55,6 @@ function RegisterForm() {
       alert('Enter a valid email address');
     }
     const response = await registerUser(registerUsername, registerEmail, registerPassword);
-    console.log(response);
   };
 
   return (

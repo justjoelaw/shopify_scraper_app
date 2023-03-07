@@ -4,14 +4,11 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 import urllib.request
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import AbstractUser
+from django.template.defaultfilters import slugify
 
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-
-# User = get_user_model()
-
-# Create your models here.
 
 
 class App(models.Model):
@@ -32,7 +29,7 @@ class App(models.Model):
         """
         if self.image_url and not self.image_file:
             image = urllib.request.urlopen(self.image_url).read()
-            self.image_file.save(self.name + '.jpg',
+            self.image_file.save(slugify(self.name) + '.jpg',
                                  ContentFile(image), save=False)
         super().save(*args, **kwargs)
 

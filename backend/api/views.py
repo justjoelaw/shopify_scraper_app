@@ -437,7 +437,7 @@ class ProfileView(generics.RetrieveAPIView):
         return self.request.user
 
 
-@ api_view(['DELETE'])
+@api_view(['DELETE'])
 def delete_tracking_by_app(request, app_id):
     app = App.objects.get(pk=app_id)
     tracking = Tracking.objects.filter(app=app, user=request.user)

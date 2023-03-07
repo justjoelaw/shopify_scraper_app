@@ -1,7 +1,7 @@
 import Button from '../Button';
 import Header from '../Header';
 import Panel from '../Panel';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import AppReviewsPlot from './AppReviewsPlot';
 
 function AppDataPanel({ app, handleBackClick, handleRemoveApp, activeAppReviewsData }) {
@@ -21,7 +21,7 @@ function AppDataPanel({ app, handleBackClick, handleRemoveApp, activeAppReviewsD
   return (
     <div>
       <Panel>
-        <Header size='h1'>{app.name}</Header>
+        <Header size='h1'>{app.name.replace(/\\u(\d+)/g, (_, code) => String.fromCharCode(parseInt(code, 16)))}</Header>
         <div>
           <span className='font-bold'>Reviews Collected: </span>
           {activeAppReviewsData.data.rating_count}

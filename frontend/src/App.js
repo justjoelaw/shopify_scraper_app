@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import IndexPage from './pages/IndexPage';
 import AddAppsPage from './pages/AddAppsPage';
 import DataPage from './pages/DataPage';

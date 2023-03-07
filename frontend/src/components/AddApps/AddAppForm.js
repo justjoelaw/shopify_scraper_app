@@ -1,11 +1,11 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import Button from '../Button';
 import APIContext from '../../context/apis';
 import AppIcon from '../AppIcon';
 import Header from '../Header';
 
 const AddAppForm = () => {
-  const { addApp, addJob, verifyApp, startJobLambda } = useContext(APIContext);
+  const { addApp, verifyApp, startJobLambda } = useContext(APIContext);
 
   const [appIdentifier, setAppIdentifier] = useState('');
   const [showAddAppVerify, setShowAddAppVerify] = useState(true);
@@ -36,7 +36,6 @@ const AddAppForm = () => {
 
     const addAppResponse = await addApp(app);
     const jobId = addAppResponse.data.job_id;
-    console.log(addAppResponse);
     if ([200, 201].includes(addAppResponse.status)) {
       setNewAppId(addAppResponse.data.app.id);
       startJobLambda(jobId);
@@ -65,7 +64,7 @@ const AddAppForm = () => {
               <AppIcon small url={app.image} />
             </div>
             <div className='w-1/2 p-2'>
-              <span className='font-bold'>App Name:</span> {app.title}
+              <span className='font-bold'>App Name:</span> {app.title.replace(/\\u(\d+)/g, (_, code) => String.fromCharCode(parseInt(code, 16)))}
               <br />
               <span className='font-bold'>Rating:</span> {app.rating}
               <br />
