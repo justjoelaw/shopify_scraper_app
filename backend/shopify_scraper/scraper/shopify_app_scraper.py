@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from django.utils import timezone
 import pytz
+from selenium.webdriver.chrome.options import Options
 
 
 def shopify_app_scraper(app_identifier: str, last_run_timestamp: str):
@@ -29,11 +30,9 @@ def shopify_app_scraper(app_identifier: str, last_run_timestamp: str):
     # This line uses the ChromeDriverManager from webdriver_manager to install the ChromeDriver executable,
     # and creates a service instance using that driver. The service instance is then passed as a parameter to the
     # webdriver.Chrome constructor, which creates an instance of the Chrome webdriver.
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-
-    # Zoom out page (easier to see script running)
-    driver.get('chrome://settings/')
-    driver.execute_script('chrome.settingsPrivate.setDefaultZoom(0.5);')
+    chromeOptions = Options()
+    chromeOptions.headless = True
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chromeOptions)
 
     output_list = []  # list to contain the extracted data
     rating_dict = {

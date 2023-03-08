@@ -190,3 +190,15 @@ sketch
 
 mediafiles
 *.ipynb
+
+
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+.shopify-scraper-venv/
+scraper_lambda_function
+
+db_user_access.sqlite3

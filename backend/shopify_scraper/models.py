@@ -3,10 +3,12 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 import urllib.request
 from django.core.files.base import ContentFile
+from django.contrib.auth.models import AbstractUser
+from django.template.defaultfilters import slugify
 
-User = get_user_model()
 
-# Create your models here.
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
 
 
 class App(models.Model):
@@ -23,24 +25,19 @@ class App(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Custom save method which fetchs the image_file from the image_url, if image_file does not exist
+        Custom save method which fetches the image_file from the image_url, if image_file does not exist
         """
         if self.image_url and not self.image_file:
             image = urllib.request.urlopen(self.image_url).read()
-            self.image_file.save(self.name + '.jpg',
+            self.image_file.save(slugify(self.name) + '.jpg',
                                  ContentFile(image), save=False)
         super().save(*args, **kwargs)
 
 
 class Job(models.Model):
-    class FrequencyEnum(models.IntegerChoices):
-        HOURLY = 1, 'Hourly'
-        DAILY = 2, 'Daily'
 
-    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='jobs')
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='jobs')
-    frequency = models.IntegerField(choices=FrequencyEnum.choices)
+    app = models.OneToOneField(App, on_delete=models.CASCADE,
+                               related_name='jobs')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     last_run_timestamp = models.DateTimeField(blank=True, null=True)
@@ -53,6 +50,9 @@ class Tracking(models.Model):
         App, on_delete=models.CASCADE, related_name='trackings')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'app',)
 
 
 class Review(models.Model):

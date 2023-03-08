@@ -1,8 +1,11 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import re
+import os
+from selenium.webdriver import Chrome
 
 
 def verify_shopify_app(app_identifier: str):
@@ -15,8 +18,15 @@ def verify_shopify_app(app_identifier: str):
     Returns:
         output (dict): A dictionary containing key info about the app
     """
+    chromeOptions = Options()
+    chromeOptions.headless = True
+    if 'RDS_DB_NAME' in os.environ:  # If deployed...
+        driver = Chrome('/usr/bin/chromedriver', options=chromeOptions)
+    else:
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        driver = webdriver.Chrome(service=Service(
+            ChromeDriverManager().install()), options=chromeOptions)
+
     driver.get(f'https://apps.shopify.com/{app_identifier}/reviews')
     html = driver.page_source
     soup = BeautifulSoup(html, features='html.parser')
@@ -39,5 +49,7 @@ def verify_shopify_app(app_identifier: str):
         'rating_count': rating_count,
         'image': image
     }
+
+    driver.quit()
 
     return output

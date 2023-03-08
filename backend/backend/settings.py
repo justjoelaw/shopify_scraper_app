@@ -31,7 +31,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
+                 'shopify-scraper-v3-dev.eu-west-2.elasticbeanstalk.com']
 
 
 # Application definition
@@ -43,9 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',
-    'shopify_scraper'
+    'rest_framework',
+    'shopify_scraper',
+    'storages'
 
 ]
 
@@ -65,7 +67,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(REAL_BASE_DIR, 'frontend/build')],
+        'DIRS': [os.path.join(BASE_DIR, 'frontend_react_build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,12 +86,34 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db_user_access.sqlite3',
+#     }
+# }
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'shopify-scraper',
+            'USER': 'shopify-scraper',
+            'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
+            'HOST': 'localhost',
+            'PORT': '5433',
+        }
+    }
 
 
 # Password validation
@@ -127,21 +151,65 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(REAL_BASE_DIR, 'frontend/build')
+STATIC_ROOT = os.path.join(BASE_DIR, 'frontend_react_build')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = (
+
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # for localhost (REACT Default)
     'http://localhost:8000',  # for localhost (Django Default)
-)
+    'http://127.0.0.1:3000',  # for localhost (REACT Default)
+    'http://127.0.0.1:8000',  # for localhost (Django Default)
+    'http://127.0.0.1',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # for localhost (REACT Default)
+    'http://localhost:8000',  # for localhost (Django Default)
+    'http://127.0.0.1:3000',  # for localhost (REACT Default)
+    'http://127.0.0.1:8000',  # for localhost (Django Default)
+    'http://127.0.0.1',
+]
 
 
 MEDIA_ROOT = os.path.join(REAL_BASE_DIR, 'mediafiles/')
 
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [os.path.join(REAL_BASE_DIR, 'frontend/build/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend_react_build/static')]
+
+AUTH_USER_MODEL = 'shopify_scraper.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '500/day'
+    }
+}
+
+
+if 'AWS_STORAGE_BUCKET_NAME' in os.environ:
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+    AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
+
+    AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']

@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect } from 'react';
 import APIContext from '../context/apis';
-import NavBar from '../components/NavBar';
 import DataHeader from '../components/Data/DataHeader';
 import AppListPanel from '../components/Data/AppListPanel';
 import AppDataPanel from '../components/Data/AppDataPanel';
@@ -10,13 +9,12 @@ function DataPage() {
   const [showAppDataPanel, setShowAppDataPanel] = useState(false);
   const [activeApp, setActiveApp] = useState(null);
 
-  const { apps, fetchAppReviewsData, activeAppReviewsData } = useContext(APIContext);
+  const { userApps, fetchAppReviewsData, activeAppReviewsData, deleteTrackingByApp, fetchAppsUser } = useContext(APIContext);
 
   useEffect(() => {
     const effectAsync = async () => {
       if (activeApp) {
-        await fetchAppReviewsData(activeApp.id);
-        console.log('UseEffect running');
+        const response = await fetchAppReviewsData(activeApp.id);
         setShowAppListPanel(false);
         setShowAppDataPanel(true);
       } else {
@@ -35,13 +33,23 @@ function DataPage() {
     setActiveApp(null);
   };
 
+  const handleRemoveApp = async (appId) => {
+    setActiveApp(null);
+    await deleteTrackingByApp(appId);
+    fetchAppsUser();
+  };
+
   return (
-    <div className='columns-1 m-20'>
-      <NavBar />
+    <div>
       <DataHeader />
-      {showAppListPanel && <AppListPanel apps={apps} handleAppClick={handleAppClick} />}
+      {showAppListPanel && <AppListPanel apps={userApps} handleAppClick={handleAppClick} />}
       {showAppDataPanel && activeApp && (
-        <AppDataPanel activeAppReviewsData={activeAppReviewsData} app={activeApp} handleBackClick={handleBackClick} />
+        <AppDataPanel
+          activeAppReviewsData={activeAppReviewsData}
+          app={activeApp}
+          handleBackClick={handleBackClick}
+          handleRemoveApp={handleRemoveApp}
+        />
       )}
     </div>
   );

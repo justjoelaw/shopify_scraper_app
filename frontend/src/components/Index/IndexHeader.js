@@ -6,20 +6,20 @@ function IndexHeader() {
     <Panel>
       <Header size='h1'>Shopify Scraper Tool</Header>
       <div>
-        This tool allows you to create and run jobs which scrape review data from the Shopify App Store
+        This tool allows users to collect reviews for apps on the Shopify App Store
         <br />
-        It is comprised of 3 main parts:
+        It is comprised of:
         <br />
         1. Backend: Django & Django REST Framework
         <br />
         2. Frontend: React
         <br />
-        3. Webscraper: BeautifulSoup & Selenium
+        3. Webscraper: BeautifulSoup & Selenium - jobs are queued and executed by AWS (SQS and Lambda)
         <br />
         <br />
         The "Last Run Timestamp" is stored for each job. The scraper will iterate over each page of reviews until it hits this date.
         <br />
-        <span className='font-bold'>Next feature:</span> Job Scheduling
+        <span className='font-bold'>Next feature:</span> Image caching
       </div>
     </Panel>
   );

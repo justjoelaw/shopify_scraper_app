@@ -2,23 +2,33 @@ import IndexHeader from '../components/Index/IndexHeader';
 import IndexButtonPanel from '../components/Index/IndexButtonPanel';
 import StatusPanel from '../components/Index/StatusPanel';
 import APIContext from '../context/apis';
+import UserContext from '../context/user';
 import { useEffect, useContext } from 'react';
 
 function IndexPage() {
-  const { fetchJobs, fetchReviews, fetchApps } = useContext(APIContext);
+  const { fetchReviewsUser, fetchAppsUser } = useContext(APIContext);
+  const { activeUser, setActiveUser, fetchActiveUser } = useContext(UserContext);
 
   useEffect(() => {
-    fetchJobs();
-    fetchReviews();
-    fetchApps();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    async function setup() {
+      const response = await fetchActiveUser();
+      setActiveUser(response.data);
+    }
+    setup();
   }, []);
 
+  useEffect(() => {
+    if (activeUser) {
+      fetchAppsUser();
+      fetchReviewsUser();
+    }
+  }, [activeUser]);
+
   return (
-    <div className='columns-1 m-20'>
+    <div>
       <IndexHeader />
-      <IndexButtonPanel />
-      <StatusPanel />
+      {activeUser && <IndexButtonPanel />}
+      {activeUser && <StatusPanel />}
     </div>
   );
 }
